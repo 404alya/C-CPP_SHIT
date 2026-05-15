@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
+printf("argc count %d %s", argc, argv[argc - 1]);
   char counter = 0;
 
   while (1) {
@@ -18,19 +18,17 @@ int main(int argc, char *argv[]) {
 
     int testoteroneBlocker;
     printf("Do you taking testoteroneBlocker?\n");
-    scanf("%d", &testoteroneBlocker); 
+    scanf("%d", &testoteroneBlocker);
 
     printf("a: %d %d", estrogen, testoteroneBlocker);
     if (estrogen && testoteroneBlocker) {
-      printf("TODO: implement transfeminie logic");
-      exit(EXIT_FAILURE);
-
+      printf("PERFECT CHOICE!!");
       break;
     }
 
     else if (estrogen && !testoteroneBlocker) {
       printf("wrong choice! think again");
-      counter = (counter + 1) % 127;
+      counter++;
       continue;
     }
   }

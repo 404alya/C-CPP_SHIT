@@ -19,9 +19,9 @@ typedef struct {
     } while (0) \
 
 Points nodes = {0};
-int main() {
-  
 
+
+int main() {
   int *a = malloc(sizeof(int) * 4);
 
 
