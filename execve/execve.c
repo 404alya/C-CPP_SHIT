@@ -6,11 +6,11 @@
 
 int main(int argc, char *argv[])
 {
-  static char *newargv[] = { NULL, "hello", "world", NULL };
+  static char *newargv[] = { NULL, "hello", NULL, "world", NULL, NULL };
   static char *newenviron[] = { NULL };
 
   if (argc != 2) {
-    fprintf(stderr, "Usage: %s <file-to-exec>\n", argv[0]); 
+    fprintf(stderr, "Usage: %s <file-to-exec>\n", argv[0]);
     exit(EXIT_FAILURE);
   }
 

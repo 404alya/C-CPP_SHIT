@@ -1,52 +1,62 @@
 #define _XOPEN_SOURCE 500
+#define _GNU_SOURCE
 #include <ftw.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static int
-display_info(const char *fpath, const struct stat *sb,
-             int tflag, struct FTW *ftwbuf)
-{
-  const char *flag_str;
-  if (tflag == FTW_D)   flag_str = "d";
-  else if (tflag == FTW_DNR) flag_str = "dnr";
-  else if (tflag == FTW_DP)  flag_str = "dp";
-  else if (tflag == FTW_F)   flag_str = "f";
-  else if (tflag == FTW_NS)  flag_str = "ns";
-  else if (tflag == FTW_SL)  flag_str = "sl";
-  else if (tflag == FTW_SLN) flag_str = "sln";
-  else flag_str = "???";
+static int display_info(
+  const char *fpath,
+  const struct stat *sb,
+  int tflag,
+  struct FTW *ftwbuf
+) {
+  if (tflag != FTW_F && tflag != FTW_D) return FTW_CONTINUE;
 
-  printf("%-3s %2d ", flag_str, ftwbuf->level);
+  char *fpathm = malloc(strlen(fpath) + 1);
+  strcpy(fpathm, fpath);
+  fpathm[strlen(fpath)] = '\0';
 
-  if (tflag == FTW_NS)
-      printf("-------");
-  else
-      printf("%7jd", (intmax_t) sb->st_size);
+  char *fpath_clean =  fpathm + ftwbuf->base;
 
-  printf("   %-40s %d %s\n",
+  printf("   %s %d %s\n",
           fpath, ftwbuf->base, fpath + ftwbuf->base);
 
-  return 0;           /* To tell nftw() to continue */
+
+
+  if (tflag == FTW_D && fpath_clean[0] == '.' && strcmp(fpath_clean, ".") != 0) {
+    free(fpathm);
+    return FTW_SKIP_SUBTREE;
+  }
+
+
+  char *dot = strrchr(fpath + ftwbuf->base, '.');
+  if (dot == NULL) return FTW_CONTINUE;
+  if (strcmp(dot, ".html")) {
+   free(fpathm);
+    return FTW_CONTINUE;  // if file not ends with .html
+  }
+
+
+
+  printf("   %s %d %s\n",
+          fpath, ftwbuf->base, fpath + ftwbuf->base);
+
+  return 0;
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int flags = 0;
+  flags |= FTW_PHYS;
+  flags |= FTW_MOUNT;
+  flags |= FTW_ACTIONRETVAL;
 
-  if (argc > 2 && strchr(argv[2], 'd') != NULL)
-      flags |= FTW_DEPTH;
-  if (argc > 2 && strchr(argv[2], 'p') != NULL)
-      flags |= FTW_PHYS;
-
-  if (nftw((argc < 2) ? "." : argv[1], display_info, 20, flags)
-      == -1)
+  if (nftw(".", display_info, 20, flags) == -1)
   {
-      perror("nftw");
-      exit(EXIT_FAILURE);
+    perror("nftw");
+    exit(EXIT_FAILURE);
   }
 
   exit(EXIT_SUCCESS);

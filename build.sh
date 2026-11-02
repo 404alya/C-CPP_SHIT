@@ -2,4 +2,4 @@
 
 set -ex
 
-clang -Wall -Wextra $1 ${@:2} -o output.o && ./output.o
+clang -Wall -Wextra $1 ${@:2} -o output.o
